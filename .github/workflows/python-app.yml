@@ -10,9 +10,24 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
       - name: Running_updates
         run: |
           pip install -r requirements.txt
           dvc repro
           git fetch --prune
-          dvc metrics diff main
+
+          # Define the branches to compare metrics against
+          branches=("i200839" "i200505" "i200802")
+
+          # Loop through each branch and compare metrics
+          for branch in "${branches[@]}"; do
+            if dvc metrics diff --quiet "$branch"; then
+              echo "No difference in metrics with $branch."
+            else
+              echo "Metrics differ with $branch. Pulling changes into main."
+              git pull origin "$branch"
+              # You may want to add additional steps here if needed
+              break  # Exit the loop after pulling changes from the first branch with differences
+            fi
+          done
