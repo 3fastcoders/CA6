@@ -11,6 +11,7 @@ import json
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.impute import SimpleImputer
+from sklearn.ensemble import RandomForestClassifier
 
 df = pd.read_csv("data_processed.csv")
 
@@ -28,8 +29,8 @@ imp.fit(X)
 X = imp.transform(X)
 
 
-# Linear model
-clf = SVC()
+# Random Forest model
+clf = RandomForestClassifier()
 yhat = cross_val_predict(clf, X, y, cv=5)
 
 acc = np.mean(yhat==y)
