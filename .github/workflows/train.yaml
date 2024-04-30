@@ -1,17 +1,23 @@
 name: DVC Tracking with Github Actions
-on: [push]
+on:
+  push:
+    branches:
+      - main  # Adjust this to your main branch name if different
+
 jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      - env:
-            GH_TOKEN: ${{ github.token }}
-      - uses: actions/checkout@v2
+      - name: Set up environment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Running_updates
         run: |
           pip install -r requirements.txt
           dvc repro
           git fetch --prune
+          dvc metrics diff main
           dvc metrics diff --md main > report.md
           gh pr comment ${{github.event.pull_request.number}} -F report.md
-          
